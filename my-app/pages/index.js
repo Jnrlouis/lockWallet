@@ -113,7 +113,9 @@ export default function Home() {
 
   const withdraw = async () => {
     try {
-      if ( unixWithdrawDate > Date.now()) {
+      console.log(unixWithdrawDate);
+      console.log(Date.now()/1000);
+      if ( unixWithdrawDate > Date.now()/1000) {
         console.log("Withdrawal not allowed");
         alert("LOCKED! You can only withdraw after the Timelock", {withdrawDate});
       } else {
