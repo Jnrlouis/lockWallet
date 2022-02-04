@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 contract TimeLock {
     address _owner;
+    uint locktime;
     constructor() {
         _owner= msg.sender;
     }
@@ -15,7 +16,10 @@ contract TimeLock {
     }
     function deposit() external payable {
         balances[msg.sender] += msg.value;
-        lockTime[msg.sender] = block.timestamp + 1 days;
+        if (locktime < block.timestamp) {
+            locktime = block.timestamp + 1 days;
+            lockTime[msg.sender] += locktime;
+        }
     }
 
     function getBalances() public view returns (uint) {
