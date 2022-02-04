@@ -8,7 +8,7 @@ Hosted on vercel: https://lock-wallet.vercel.app/
 ### Contracts
 Deployed on BSC Testnet
 
-Contract Address : https://testnet.bscscan.com//address/0x2F3DF634F29DFa994E05c936f29E419113c1b212
+Contract Address : https://testnet.bscscan.com//address/0x18Be62Cf5f1bef2B7a87d3BD47C4427b08dc8Fba
 
 ---
 
