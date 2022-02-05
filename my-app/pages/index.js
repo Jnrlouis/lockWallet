@@ -7,7 +7,7 @@ import WalletConnectProvider from '@walletconnect/web3-provider';
 import { TIMELOCK_CONTRACT_ABI, TIMELOCK_CONTRACT_ADDRESS } from "../constants";
 //npm install react-loader-spinner --save
 //import React from "react";
-//import Loader from "react-loader-spinner";
+import Loader from "react-loader-spinner";
 //import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 
 
@@ -19,7 +19,7 @@ export default function Home() {
   const [withdrawDate, setWithdrawDate] = useState();
   const [unixWithdrawDate, setUnixWithdrawDate] = useState();
   const [extendTime, setExtendTime] = useState();
-  const [isLoading, setIsLoading] = useState(false);
+  const [izLoading, setIzLoading] = useState(false);
   const [isProv, setIsProv] = useState(false);
   const web3ModalRef = useRef();
   const providerOptions = {
@@ -63,12 +63,15 @@ export default function Home() {
   };
 
   useEffect( async () => {
-    // if Provider is true
-    if (isProv) {
-      provider = await web3ModalRef.current.connect();
+    // if Provider is true and ethereum is injected
+    if (ethereum) {
+      if (isProv) {
+        provider = await web3ModalRef.current.connect();
+      }
     }
   },
   );
+
 
   const getBalance = async () => {
     try {
@@ -100,11 +103,11 @@ export default function Home() {
       );
       console.log("Deposit amount: ", depositAmount);
       let addMoney = await timelockContract.deposit({value: depositAmount});
-      setIsLoading(true);
+      setIzLoading(true);
       await addMoney.wait();
       await getBalance();
       await getLocktime();
-      setIsLoading(false);
+      setIzLoading(false);
 
     } catch (err) {
       console.error(err);
@@ -113,8 +116,6 @@ export default function Home() {
 
   const withdraw = async () => {
     try {
-      console.log(unixWithdrawDate);
-      console.log(Date.now()/1000);
       if ( unixWithdrawDate > Date.now()/1000) {
         console.log("Withdrawal not allowed");
         alert("LOCKED! You can only withdraw after the Timelock", {withdrawDate});
@@ -127,11 +128,11 @@ export default function Home() {
         );
         console.log("Withdraw All");
         let withdrawMoney = await timelockContract.withdraw();
-        setIsLoading(true);
+        setIzLoading(true);
         await withdrawMoney.wait();
         await getBalance();
         setWithdrawDate("Not Available");
-        setIsLoading(false);
+        setIzLoading(false);
       }
 
     } catch (err) {
@@ -176,10 +177,10 @@ export default function Home() {
       } else {
         extendedDate = extendedDate - unixWithdrawDate;
         const increaseTime = await timelockContract.increaseLockTime(extendedDate);
-        setIsLoading(true);
+        setIzLoading(true);
         await increaseTime.wait();
         await getLocktime();
-        setIsLoading(false);
+        setIzLoading(false);
       }
 
     } catch (err) {
@@ -195,12 +196,15 @@ export default function Home() {
         cacheProvider: true,
         disableInjectedProvider: false,
       });
-      setIsLoading(true);
+      provider = await web3ModalRef.current.connect();
+      setIzLoading(true);
       await getBalance();
       await getLocktime();
-      setIsLoading(false);
-      setWalletConnected(true); 
-
+      setIzLoading(false);
+      if (ethereum) {
+        setWalletConnected(true);
+      }
+       
     } catch (err) {
       console.error(err);
     }
@@ -208,9 +212,10 @@ export default function Home() {
 
   const onDisconnect = async () => {
     try {
-      await web3ModalRef.current.clearCachedProvider();
-      setWalletConnected(false);
       setIsProv(false);
+      await web3ModalRef.current.clearCachedProvider();
+      provider = await web3ModalRef.current.clearCachedProvider();
+      setWalletConnected(false);
       console.log("Disconnected");
 
     } catch (err) {
@@ -295,11 +300,12 @@ export default function Home() {
         <link rel="icon" href="/treasurechest.png" />
       </Head>
       <div className={styles.main}>
-        <div>
+        <div className={styles.body}>
           <div className={styles.titleHead}>
             <h1 className={styles.title}>Kolo </h1>
             <img className={styles.image} src="/treasurechest.png" alt="Treasure Chest"></img>
           </div>
+      
           <div className={styles.description1}>
             Lock up your coins in this kolo for rainy days
           </div>
@@ -312,19 +318,21 @@ export default function Home() {
             : renderOnDisconnect()}
             <div>
               <br/><br/><br/>
-              {isLoading == true ?
+              {izLoading == true ?
                 loading()
               : null}
             </div>
           
           </div>
           
+          <footer className={styles.footer}>
+            Made with &#10084; by:  <a href="https://www.twitter.com/@Jnrlouis" target = "_blank" rel="noreferrer"> @Jnrlouis</a>
+          </footer>
         </div>
+
       </div>
 
-      <footer className={styles.footer}>
-        Made with &#10084; by:  <a href="https://www.twitter.com/@Jnrlouis" target = "_blank" rel="noreferrer"> @Jnrlouis</a>
-      </footer>
+
     </div>
   );
 
