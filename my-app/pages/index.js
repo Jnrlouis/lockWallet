@@ -201,7 +201,7 @@ export default function Home() {
       await getBalance();
       await getLocktime();
       setIzLoading(false);
-      if (ethereum) {
+      if (ethereum || isProv) {
         setWalletConnected(true);
       }
        
