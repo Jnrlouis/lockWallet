@@ -61,7 +61,7 @@ describe("TimeLock Wallet", function () {
   });
 
   describe("Withdrawal", function () {
-    it("Should not be able to withraw till 5 minutes", async function() {
+    it("Should not be able to withraw till 1 day", async function() {
       let txn = await timelock.deposit({
         value: ethers.utils.parseEther("50")
       });
@@ -70,12 +70,12 @@ describe("TimeLock Wallet", function () {
       expect(timelock.withdraw()).to.be.revertedWith("Lock time not expired");
     });
 
-    it("Should be able to withraw after 5 minutes", async function() {
+    it("Should be able to withraw after 1 day", async function() {
       let txn = await timelock.deposit({
         value: ethers.utils.parseEther("50")
       });
       await txn.wait();
-      await network.provider.send("evm_increaseTime", [300]);
+      await network.provider.send("evm_increaseTime", [86400]);
       await network.provider.send("evm_mine");
       let withdraw = await timelock.withdraw();
       await withdraw.wait();
@@ -94,7 +94,7 @@ describe("TimeLock Wallet", function () {
       });
       await txn.wait();
       await timelock.connect(addr1).increaseLockTime(400);
-      await network.provider.send("evm_increaseTime", [300]);
+      await network.provider.send("evm_increaseTime", [86700]);
       await network.provider.send("evm_mine");
       let withdraw = await timelock.withdraw();
       await withdraw.wait();
@@ -103,7 +103,7 @@ describe("TimeLock Wallet", function () {
       console.log(ethers.utils.formatEther(bal1));
       expect(ethers.utils.formatEther(bal)).to.equal("0.0");
       //expect(timelock.connect(addr1).withdraw()).to.be.revertedWith("Lock time not expired");
-      await network.provider.send("evm_increaseTime", [400]);
+      await network.provider.send("evm_increaseTime", [86700]);
       await network.provider.send("evm_mine");
       let withdraw1 = await timelock.connect(addr1).withdraw();
       await withdraw1.wait();
